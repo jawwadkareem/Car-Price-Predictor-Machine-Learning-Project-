@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Price Predictor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevents scrolling */
+        }
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/static/bg.jpg'); /* Ensure the path is correct */
+            background-size: cover;
+            background-position: center;
+            filter: blur(3px);
+            z-index: -1; /* Ensures the background is behind everything else */
+        }
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent white background */
+            backdrop-filter: blur(10px); /* Blurs the background */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        h1 {
+            text-align: center;
+            color: #03045E;
+        }
+        .button-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            grid-column: span 2;
+        }
+        form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            grid-column: span 2;
+        }
+        label {
+            margin-bottom: 5px;
+            color: #03045E;
+
+        }
+        input, select {
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px;
+            background-color: #0077B6;
+            color: white;
+            border: none;
+            cursor: pointer;
+
+        }
+        button:hover {
+            background-color: #023E8A;
+        }
+           .clear-button {
+            background-color: #6c757d;
+        }
+        .clear-button:hover {
+            background-color: #5a6268;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9e9e9;
+            grid-column: span 2;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="container">
+        <h1>Car Price Predictor</h1>
+        <form id="priceForm">
+            <div>
+                <label for="make">Make</label>
+                <input type="text" id="make" name="make" required>
+            </div>
+            <div>
+                <label for="model">Model</label>
+                <input type="text" id="model" name="model" required>
+            </div>
+            <div>
+                <label for="year">Year</label>
+                <input type="number" id="year" name="year" required>
+            </div>
+            <div>
+                <label for="engine">Engine (CC)</label>
+                <input type="number" id="engine" name="engine" required>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label for="transmission">Transmission</label>
+                    <select id="transmission" name="transmission" required>
+                        <option value="Manual">Manual</option>
+                        <option value="Automatic">Automatic</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="fuel">Fuel Type</label>
+                    <select id="fuel" name="fuel" required>
+                        <option value="Petrol">Petrol</option>
+                        <option value="Diesel">Diesel</option>
+                        <option value="Electric">Electric</option>
+                        <option value="Hybrid">Hybrid</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="mileage">Mileage</label>
+                    <input type="number" id="mileage" name="mileage" required>
+                </div>
+            </div>
+
+           <div class="button-row">
+                <button type="submit">Predict Price</button>
+                <button type="button" class="clear-button" onclick="clearForm()">Clear Form</button>
+            </div>
+        </form>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('priceForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+
+
+            const actualPrice = result.price; // Actual price
+            const formattedPrice = result.price.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+            // Update result display
+            document.getElementById('result').innerHTML = `
+                <p>Price: Rs ${formattedPrice} (${actualPrice})</p>
+            `;
+        });
+
+        function clearForm() {
+            document.getElementById('priceForm').reset();
+            document.getElementById('result').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
